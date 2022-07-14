@@ -240,6 +240,10 @@ WHEN NOT MATCHED AND u.type = "insert"
 
 -- COMMAND ----------
 
+select * from students
+
+-- COMMAND ----------
+
 -- MAGIC %md
 -- MAGIC 
 -- MAGIC 
@@ -247,6 +251,22 @@ WHEN NOT MATCHED AND u.type = "insert"
 -- MAGIC Note that only 3 records were impacted by our **`MERGE`** statement; one of the records in our updates table did not have a matching **`id`** in the students table but was marked as an **`update`**. Based on our custom logic, we ignored this record rather than inserting it. 
 -- MAGIC 
 -- MAGIC How would you modify the above statement to include unmatched records marked **`update`** in the final **`INSERT`** clause?
+
+-- COMMAND ----------
+
+MERGE INTO students b
+USING updates u
+ON b.id=u.id
+WHEN MATCHED AND u.type = "update"
+  THEN UPDATE SET *
+WHEN MATCHED AND u.type = "delete"
+  THEN DELETE
+WHEN NOT MATCHED 
+  THEN INSERT *
+
+-- COMMAND ----------
+
+select * from students
 
 -- COMMAND ----------
 
