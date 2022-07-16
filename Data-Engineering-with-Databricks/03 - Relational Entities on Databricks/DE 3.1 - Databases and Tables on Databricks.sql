@@ -101,6 +101,10 @@ DESCRIBE DATABASE EXTENDED ${da.db_name}_custom_location;
 
 -- COMMAND ----------
 
+DESCRIBE DATABASE ${da.db_name}_custom_location;
+
+-- COMMAND ----------
+
 -- MAGIC %md
 -- MAGIC 
 -- MAGIC  
