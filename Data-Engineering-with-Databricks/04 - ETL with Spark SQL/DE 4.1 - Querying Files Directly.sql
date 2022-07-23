@@ -64,6 +64,11 @@
 -- COMMAND ----------
 
 -- MAGIC %python
+-- MAGIC print(DA.paths.datasets)
+
+-- COMMAND ----------
+
+-- MAGIC %python
 -- MAGIC dataset_path = f"{DA.paths.datasets}/raw/events-kafka"
 -- MAGIC print(dataset_path)
 -- MAGIC 
