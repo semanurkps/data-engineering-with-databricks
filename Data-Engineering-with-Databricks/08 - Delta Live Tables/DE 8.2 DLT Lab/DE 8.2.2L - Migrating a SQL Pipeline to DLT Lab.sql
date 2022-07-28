@@ -34,8 +34,8 @@
 -- COMMAND ----------
 
 -- TODO
-CREATE <FILL-IN>
-AS SELECT <FILL-IN>
+CREATE OR REFRESH STREAMING LIVE TABLE recordings_bronze
+AS SELECT current_timestamp() receipt_time, input_file_name() source_file, *
   FROM cloud_files("${source}", "json", map("cloudFiles.schemaHints", "time DOUBLE"))
 
 -- COMMAND ----------
@@ -59,9 +59,9 @@ AS SELECT <FILL-IN>
 -- COMMAND ----------
 
 -- TODO
-CREATE <FILL-IN> pii
+CREATE OR REFRESH STREAMING LIVE TABLE pii
 AS SELECT *
-  FROM cloud_files("/mnt/training/healthcare/patient", "csv", map(<FILL-IN>))
+  FROM cloud_files("/mnt/training/healthcare/patient", "csv",  map("header", "true", "cloudFiles.inferColumnTypes", "true"))
 
 -- COMMAND ----------
 
@@ -88,14 +88,17 @@ AS SELECT *
 
 -- TODO
 CREATE OR REFRESH STREAMING LIVE TABLE recordings_enriched
-  (<FILL-IN add a constraint to drop records when heartrate ! > 0>)
+  (CONSTRAINT valid_heartrate EXPECT (heartrate>0) ON VIOLATION DROP ROW)
+  --(<FILL-IN add a constraint to drop records when heartrate ! > 0>)
 AS SELECT 
-  CAST(<FILL-IN>) device_id, 
-  <FILL-IN mrn>, 
-  <FILL-IN heartrate>, 
+  CAST(r.devide_id as INTEGER) device_id, 
+  CAST(r.mrn as LONG) mrn, 
+  CAST(r.heartrate as DOUBLE) heartrate, 
   CAST(FROM_UNIXTIME(DOUBLE(time), 'yyyy-MM-dd HH:mm:ss') AS TIMESTAMP) time 
-  FROM STREAM(live.recordings_bronze)
-  <FILL-IN specify source and perform inner join with pii on mrn>
+  FROM STREAM(live.recordings_bronze) r
+  INNER JOIN STREAM(LIVE.pii) p
+  ON r.mrn = p.mrn
+  --<FILL-IN specify source and perform inner join with pii on mrn>
 
 -- COMMAND ----------
 
@@ -116,9 +119,11 @@ AS SELECT
 -- COMMAND ----------
 
 -- TODO
-CREATE <FILL-IN> daily_patient_avg
-  COMMENT <FILL-IN insert comment here>
-AS SELECT <FILL-IN>
+CREATE OR REFRESH STREAMING LIVE TABLE daily_patient_avg
+  COMMENT "aggregated recordings enriched table by mrn, name and date"
+AS SELECT mrn, name, MEAN(heartrate) avg_heartrate, DATE(time) `date`
+FROM recordings_bronze
+GROUP BY mrn, name, DATE(time) 
 
 -- COMMAND ----------
 
