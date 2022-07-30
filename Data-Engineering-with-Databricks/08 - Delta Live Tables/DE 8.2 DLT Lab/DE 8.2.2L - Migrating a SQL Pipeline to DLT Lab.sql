@@ -93,7 +93,7 @@ AS SELECT
   CAST(r.devide_id as INTEGER) device_id, 
   CAST(r.mrn as LONG) mrn, 
   CAST(r.heartrate as DOUBLE) heartrate, 
-  CAST(FROM_UNIXTIME(DOUBLE(time), 'yyyy-MM-dd HH:mm:ss') AS TIMESTAMP) time,
+  CAST(FROM_UNIXTIME(r.time, 'yyyy-MM-dd HH:mm:ss') AS TIMESTAMP) time,
   p.name
   FROM STREAM(live.recordings_bronze) r
   INNER JOIN STREAM(LIVE.pii) p

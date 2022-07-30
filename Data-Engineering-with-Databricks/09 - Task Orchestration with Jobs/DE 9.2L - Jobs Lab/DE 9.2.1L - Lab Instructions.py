@@ -58,6 +58,11 @@ print_pipeline_config()
 
 # COMMAND ----------
 
+# MAGIC %sql
+# MAGIC SHOW DATABASES
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC 
 # MAGIC 
