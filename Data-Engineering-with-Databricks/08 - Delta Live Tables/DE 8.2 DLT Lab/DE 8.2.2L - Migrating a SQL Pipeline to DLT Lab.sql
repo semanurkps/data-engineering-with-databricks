@@ -88,17 +88,17 @@ AS SELECT *
 
 -- TODO
 CREATE OR REFRESH STREAMING LIVE TABLE recordings_enriched
-  (CONSTRAINT valid_heartrate EXPECT (heartrate>0) ON VIOLATION DROP ROW)
-  --(<FILL-IN add a constraint to drop records when heartrate ! > 0>)
+  (CONSTRAINT positive_heartrate EXPECT (heartrate>0) ON VIOLATION DROP ROW)
 AS SELECT 
   CAST(r.devide_id as INTEGER) device_id, 
   CAST(r.mrn as LONG) mrn, 
   CAST(r.heartrate as DOUBLE) heartrate, 
-  CAST(FROM_UNIXTIME(DOUBLE(time), 'yyyy-MM-dd HH:mm:ss') AS TIMESTAMP) time 
+  CAST(FROM_UNIXTIME(DOUBLE(time), 'yyyy-MM-dd HH:mm:ss') AS TIMESTAMP) time,
+  p.name
   FROM STREAM(live.recordings_bronze) r
   INNER JOIN STREAM(LIVE.pii) p
   ON r.mrn = p.mrn
-  --<FILL-IN specify source and perform inner join with pii on mrn>
+
 
 -- COMMAND ----------
 
